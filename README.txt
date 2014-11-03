@@ -12,7 +12,7 @@ Installation:
 	Go to QVC and export certificate for host that AccessControlTestModule is running on with password test
 	Copy certificates from C:\ProgramData\QlikTech\QlikView12\Repository\Exported Certificates\[host] to the directory where you unzipped AccessControlTestModule
 	From the directory where you unzipped AccessControlTestModule run "node AccessControlTestModule.js"
-	Add a virtual proxy to the proxy with prefix "custom", Authentication module redirect URI "https://[server]:8185, Session cookie header name to "X-QlikView-Session-custom" and press OK and then Save.
+	Add a virtual proxy to the proxy with prefix "custom", Authentication module redirect URI "https://[server]:8185, Session cookie header name to "X-Qlik-Session-custom" and press OK and then Save.
 	Access the platform on https://[QV proxy server]/custom/hub or https://[QV proxy server]/custom/qmc and you will be authenticated with the new module
 
 Setup:
