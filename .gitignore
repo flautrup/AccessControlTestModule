@@ -1,3 +1,10 @@
+#Node modules
+node_modules/
+
+#Certificates files
+*.pfx
+*.cer
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
