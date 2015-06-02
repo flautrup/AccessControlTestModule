@@ -1,17 +1,51 @@
+/*
+=========================================================================================
+File: AccessControlTestModule.js
+Developer: Fredrik Lautrup
+Created Date: Sometime in 2014
+
+Description:
+The AccessControlTestModule uses node.js and express.js to create a lightweight web
+server for testing the ticketing authentication method in Qlik Sense Enterprise Server.
+
+WARNING!:
+This code is intended for testing and demonstration purposes only.  It is not meant for
+production environments.  In addition, the code is not supported by Qlik. 
+
+Change Log
+Developer                       Change Description                      Modify Date
+-----------------------------------------------------------------------------------------
+Fredrik Lautrup                 Initial Release                         circa Q4 2014
+Jeffrey Goldberg                Updated for Expressjs v4.x              01-June-2015 
+
+-----------------------------------------------------------------------------------------
+
+
+=========================================================================================
+*/
+
 var https = require('https');
 var http = require('http');
 var express=require('express');
 var fs = require('fs');
 var url= require('url');
 
-var app = express();
+var session = require('express-session');
+var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
 
-app.configure(function () {
-    app.use(express.bodyParser());
-	app.use(express.cookieParser('Test'));
-	app.use(express.session());
-    app.use(app.router);
-});
+var app = express();
+//set the port for the listener here
+app.set('port', 8185);
+
+
+//new Expressjs 4.x notation for configuring other middleware components
+app.use(session({ resave: true,
+                  saveUninitialized: true,
+                  secret: 'uwotm8' }));
+app.use(cookieParser('Test'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', function (req, res) {
       console.log("Send login page");
@@ -64,7 +98,7 @@ function logout(req, res, selectedUser, userDirectory) {
         path: url.parse(RESTURI).path+'/user/'+userDirectory.toString()+'/' + selectedUser.toString() + '?xrfkey=aaaaaaaaaaaaaaaa',
         method: 'DELETE',
 		pfx: fs.readFileSync('Client.pfx'),
-		passphrase: 'test',
+		passphrase: 'enterYourCertificatePasswordHere',
         headers: { 'x-qlik-xrfkey': 'aaaaaaaaaaaaaaaa', 'Content-Type': 'application/json' },
 		rejectUnauthorized: false,
         agent: false
@@ -103,7 +137,7 @@ function requestticket(req, res, selecteduser, userdirectory, RESTURI, targetId)
         method: 'POST',
         headers: { 'X-qlik-xrfkey': 'aaaaaaaaaaaaaaaa', 'Content-Type': 'application/json' },
 		pfx: fs.readFileSync('client.pfx'),
-		passphrase: 'test',
+		passphrase: 'enterYourCertificatePasswordHere',
 		rejectUnauthorized: false,
         agent: false
     };
@@ -146,8 +180,12 @@ function requestticket(req, res, selecteduser, userdirectory, RESTURI, targetId)
 //Server options to run an HTTPS server
 var httpsoptions = {
     pfx: fs.readFileSync('server.pfx'),
-    passphrase: 'test'
+    passphrase: 'enterYourCertificatePasswordHere'
 };
 
 //Start listener
-https.createServer(httpsoptions, app).listen(8185);
+var server = https.createServer(httpsoptions, app);
+server.listen(app.get('port'), function()
+{
+  console.log('Express server listening on port ' + app.get('port'));
+});
