@@ -6,7 +6,6 @@ config.certificateConfig = {
 };
 
 config.sessionSecret='uwotm8';
-config.userDirectory = 'azure';
 
 config.port='8185';
 
