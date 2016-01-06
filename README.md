@@ -25,9 +25,6 @@ To add a new user add this section in the table, userid is the "value" attribute
  <option value="bbr">Bryan Baker (bbr) - Vice President of Sales</option>
 ```
 
-value = userID
-Text = What is displayed in the drop down
-
 To change the userDirectory name, change the "name" attribute of the following line:
 ```
 <select id="UserList" class="UserLogin" name="QVNCYCLES" onchange="doLogin(this);">
