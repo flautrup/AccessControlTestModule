@@ -1,5 +1,5 @@
 /*
-=========================================================================================
+============================================================================================
 File: AccessControlTestModule.js
 Developer: Fredrik Lautrup
 Created Date: Sometime in 2014
@@ -13,16 +13,17 @@ This code is intended for testing and demonstration purposes only.  It is not me
 production environments.  In addition, the code is not supported by Qlik.
 
 Change Log
-Developer                       Change Description                      Modify Date
------------------------------------------------------------------------------------------
-Fredrik Lautrup                 Initial Release                         circa Q4 2014
-Jeffrey Goldberg                Updated for Expressjs v4.x              01-June-2015
-Fredrik Lautrup                 Added external config file              03-November-2015
+Developer                       Change Description                          Modify Date
+--------------------------------------------------------------------------------------------
+Fredrik Lautrup                 Initial Release                             circa Q4 2014
+Jeffrey Goldberg                Updated for Expressjs v4.x                  01-June-2015
+Fredrik Lautrup                 Added external config file                  03-November-2015
+Steve Newman                    Updated Logout method and iframe support    06-January-2016
 
------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
 
 
-=========================================================================================
+============================================================================================
 */
 
 var config = require('./config');
@@ -50,28 +51,25 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', function (req, res) {
-      console.log("Send login page");
-	  //Store targetId and RESTURI in a session
-	  req.session.targetId = req.query.targetId;
-      req.session.RESTURI = req.query.proxyRestUri;
+      console.log("Root request, received:", req.query);
       res.sendfile('SelectUser.htm');
  });
 
 app.get('/logout', function (req, res) {
-    console.log("Logout user "+selectedUser+" directory "+userDirectory);
 	var selectedUser = req.query.selectedUser;
     var userDirectory = req.query.userDirectory;
+    console.log("Logout user: "+selectedUser+" directory: "+userDirectory);
+
 	logout(req,res,selectedUser,userDirectory);
+	req.session.destroy();
 });
 
 app.get('/login', function (req, res) {
     var selectedUser = req.query.selectedUser;
     var userDirectory = req.query.userDirectory;
-	var targetId=req.session.targetId;
-	var RESTURI=req.session.RESTURI;
-    console.log("Login user "+selectedUser+" directory "+userDirectory+"targetId"+targetId);
-	//Request a ticket for the user and user directory
-    requestticket(req, res, selectedUser, userDirectory, RESTURI, targetId);
+    console.log("Login user: "+selectedUser+" Directory: "+userDirectory);
+
+    requestticket(req, res, selectedUser, userDirectory);
 	req.session.destroy();
 });
 
@@ -93,15 +91,16 @@ app.get("/resource/background", function (req, res) {
 
 
 function logout(req, res, selectedUser, userDirectory) {
+
     //Configure parameters for the logout request
     var options = {
-        host: url.parse(RESTURI).hostname,
-        port: url.parse(RESTURI).port,
-        path: url.parse(RESTURI).path+'/user/'+userDirectory.toString()+'/' + selectedUser.toString() + '?xrfkey=aaaaaaaaaaaaaaaa',
+        host: url.parse(config.RESTURI).hostname,
+        port: url.parse(config.RESTURI).port,
+        path: url.parse(config.RESTURI).path+'/user/'+userDirectory.toString()+'/' + selectedUser.toString() + '?xrfkey=aaaaaaaaaaaaaaaa',
         method: 'DELETE',
-		pfx: fs.readFileSync('Client.pfx'),
+        headers: { 'X-qlik-xrfkey': 'aaaaaaaaaaaaaaaa', 'Content-Type': 'application/json' },
+		pfx: fs.readFileSync('client.pfx'),
 		passphrase: config.certificateConfig.passphrase,
-        headers: { 'x-qlik-xrfkey': 'aaaaaaaaaaaaaaaa', 'Content-Type': 'application/json' },
 		rejectUnauthorized: false,
         agent: false
     };
@@ -115,9 +114,12 @@ function logout(req, res, selectedUser, userDirectory) {
         ticketres.on('data', function (d) {
 			console.log(selectedUser, " is logged out");
             console.log("DELETE Response:", d.toString());
-			res.send("<HTML><HEAD></HEAD><BODY>"+selectedUser + " is logged out<BR><PRE>"+ d.toString()+"</PRE></BODY><HTML>");
-        });
+			
+            redirectURI = '/';
 
+            console.log("Logout redirect:", redirectURI);
+            res.redirect(redirectURI);
+        });
     });
 
     //Send request to logout
@@ -129,13 +131,13 @@ function logout(req, res, selectedUser, userDirectory) {
 };
 
 
-function requestticket(req, res, selecteduser, userdirectory, RESTURI, targetId) {
+function requestticket(req, res, selecteduser, userdirectory) {
 
     //Configure parameters for the ticket request
     var options = {
-        host: url.parse(RESTURI).hostname,
-        port: url.parse(RESTURI).port,
-        path: url.parse(RESTURI).path + '/ticket?xrfkey=aaaaaaaaaaaaaaaa',
+        host: url.parse(config.RESTURI).hostname,
+        port: url.parse(config.RESTURI).port,
+        path: url.parse(config.RESTURI).path + '/ticket?xrfkey=aaaaaaaaaaaaaaaa',
         method: 'POST',
         headers: { 'X-qlik-xrfkey': 'aaaaaaaaaaaaaaaa', 'Content-Type': 'application/json' },
 		pfx: fs.readFileSync('client.pfx'),
@@ -144,7 +146,7 @@ function requestticket(req, res, selecteduser, userdirectory, RESTURI, targetId)
         agent: false
     };
 
-	//console.log(targetId);
+	console.log("Path:", options.path.toString());
     //Send ticket request
     var ticketreq = https.request(options, function (ticketres) {
         console.log("statusCode: ", ticketres.statusCode);
@@ -152,16 +154,12 @@ function requestticket(req, res, selecteduser, userdirectory, RESTURI, targetId)
 
         ticketres.on('data', function (d) {
             //Parse ticket response
-			//console.log(d.toString());
+			console.log(selecteduser, " is logged in");
+			console.log("POST Response:", d.toString());
+			
             var ticket = JSON.parse(d.toString());
-
-            //Build redirect including ticket
-			 if (ticket.TargetUri.indexOf("?") > 0) {
-                redirectURI = ticket.TargetUri + '&QlikTicket=' + ticket.Ticket;
-            } else {
-                redirectURI = ticket.TargetUri + '?QlikTicket=' + ticket.Ticket;
-            }
-
+			
+            redirectURI = '/?selecteduser='+ selecteduser +'&QlikRedirect='+ config.REDIRECT + '?QlikTicket=' + ticket.Ticket;
 
             console.log("Login redirect:", redirectURI);
             res.redirect(redirectURI);
@@ -169,8 +167,8 @@ function requestticket(req, res, selecteduser, userdirectory, RESTURI, targetId)
     });
 
     //Send JSON request for ticket
-    var jsonrequest = JSON.stringify({ 'UserDirectory': userdirectory.toString() , 'UserId': selecteduser.toString(), 'Attributes': [], 'TargetId': targetId.toString() });
-	//console.log(jsonrequest);
+    var jsonrequest = JSON.stringify({ 'UserDirectory': userdirectory.toString() , 'UserId': selecteduser.toString(), 'Attributes': [] });
+
     ticketreq.write(jsonrequest);
     ticketreq.end();
 
