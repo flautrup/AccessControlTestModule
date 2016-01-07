@@ -27,9 +27,10 @@
 		background-attachment: fixed, fixed;
     }
 
-	.UserLogout {
+	.UserBtn {
 	  float: right;
 	  margin-bottom: 0px;
+	  margin-left: 5px;
 	}
 
 	.UserLogin {
@@ -57,8 +58,8 @@
  <option value="pey">Peter Connelly (pey) - System Administrator</option>
 </select>
 </span>
-<BUTTON id="logoutspan" class="UserLogout" style="display: none;" onclick="doLogout();">Logout</BUTTON>
-<BUTTON id="reset"		class="UserLogout" style="display: none;" onclick="doReset();">Reset</BUTTON>
+<BUTTON id="logoutspan" class="UserBtn" style="display: none;" onclick="doLogout();">Logout</BUTTON>
+<BUTTON id="reset"		class="UserBtn" style="display: none;" onclick="doReset();">Reset</BUTTON>
 
 
 <div id="analysis"><iframe id="targetFrame" style="display: none;" src="" width="100%"></iframe></div>
@@ -66,24 +67,38 @@
 
 <script>
   var query = getQueryParams(document.location.search);
-
-  //If we get a ticket, show the hub with the ticket, hide the user selection message, and show the logout button
+  var contentFrame = document.getElementById('targetFrame');
+  
   if (query.QlikRedirect) {
-    contentFrame = document.getElementById('targetFrame');
+    //If we get a ticket, show the QlikRedirect URL using the QlikTicket, hide the user selection message, and show the reset/logout button
 	contentFrame.height = window.innerHeight - 200;
 	contentFrame.src = query.QlikRedirect;
+	
 	contentFrame.style.display = "block";
-
 	document.getElementById('selectuser').style.display = "none";
 	document.getElementById('reset').style.display = "block";
 	document.getElementById('logoutspan').style.display = "block";
+	
   } else {
-    //If we don't have a ticket, show the select user message and hide the logout button
+    //If we don't have a ticket, show the select user message and hide the reset/iframe/logout items
   	document.getElementById('selectuser').style.display = "block";
+	contentFrame.style.display = "none";
+	document.getElementById('reset').style.display = "none";
+	document.getElementById('logoutspan').style.display = "none";
   }
   
-  //If we get a user, select the user in the drop down
-  if (query.selecteduser) {document.getElementById('UserList').value = query.selecteduser;}
+  //If we get an authenticated user, select the user in the drop down and disable the others
+  if (query.selecteduser) {
+    var selectElem = document.getElementById( 'UserList');
+	selectElem.value = query.selecteduser;
+	
+	for (i = 0; i < selectElem.options.length; i++) { 
+	(selectElem.options[i].selected)
+      ? selectElem.options[i].disabled = false 
+      : selectElem.options[i].disabled = true ;
+	}
+
+  }
   
   function doLogin(my) {
 	  document.location = "/login?selectedUser="+my.value+"&userDirectory="+my.name;
@@ -92,7 +107,7 @@
   function doReset() {
 	  contentFrame = document.getElementById('targetFrame');
 	  contentFrame.height = window.innerHeight - 200;
-	  contentFrame.src = query.QlikRedirect;
+	  contentFrame.src = removeURLParameter(query.QlikRedirect,'QlikTicket');
 	}
 	
   function doLogout() {
@@ -113,6 +128,27 @@
     return params;
   }
 
+  function removeURLParameter(url, parameter) {
+    var urlparts= url.split('?');   
+    if (urlparts.length>=2) {
+
+        var prefix= encodeURIComponent(parameter)+'=';
+        var pars= urlparts[1].split(/[&;]/g);
+
+        //reverse iteration as may be destructive
+        for (var i= pars.length; i-- > 0;) {    
+            //idiom for string.startsWith
+            if (pars[i].lastIndexOf(prefix, 0) !== -1) {  
+                pars.splice(i, 1);
+            }
+        }
+
+        url= urlparts[0]+'?'+pars.join('&');
+        return url;
+    } else {
+        return url;
+    }
+}
 
 </script>
 	

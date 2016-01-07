@@ -18,7 +18,7 @@ Developer                       Change Description                          Modi
 Fredrik Lautrup                 Initial Release                             circa Q4 2014
 Jeffrey Goldberg                Updated for Expressjs v4.x                  01-June-2015
 Fredrik Lautrup                 Added external config file                  03-November-2015
-Steve Newman                    Updated Logout method and iframe support    06-January-2016
+Steve Newman                    Updated Logout method and iframe support    07-January-2016
 
 --------------------------------------------------------------------------------------------
 
@@ -36,6 +36,7 @@ var url= require('url');
 var session = require('express-session');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
+var querystring = require("querystring");
 
 var app = express();
 //set the port for the listener here
@@ -159,7 +160,20 @@ function requestticket(req, res, selecteduser, userdirectory) {
 			
             var ticket = JSON.parse(d.toString());
 			
-            redirectURI = '/?selecteduser='+ selecteduser +'&QlikRedirect='+ config.REDIRECT + '?QlikTicket=' + ticket.Ticket;
+			//Add the QlikTicket to the redirect URL regardless whether the existing REDIRECT has existing params.
+			var myRedirect = url.parse(config.REDIRECT);
+			
+			var myQueryString = querystring.parse(myRedirect.query);
+			myQueryString['QlikTicket'] = ticket.Ticket; 
+
+            redirectURI = '/?selecteduser='+ selecteduser;
+
+			//This replaces the existing REDIRECT querystring with the one with the QlikTicket.			
+			if (typeof(myRedirect.query) == 'undefined' || myRedirect.query === null) {
+				redirectURI += '&QlikRedirect='+ querystring.escape(myRedirect.href + '?' + querystring.stringify(myQueryString));
+			} else {
+				redirectURI += '&QlikRedirect='+ querystring.escape(myRedirect.href.replace(myRedirect.query,querystring.stringify(myQueryString)));
+			}			
 
             console.log("Login redirect:", redirectURI);
             res.redirect(redirectURI);
