@@ -52,8 +52,21 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', function (req, res) {
-      console.log("Root request, received:", req.query);
-      res.sendfile('SelectUser.htm');
+	//Store targetId and RESTURI in a session
+	(typeof(req.query.proxyRestUri) == 'undefined' || req.query.proxyRestUri === null) ?
+	req.session.RESTURI = config.RESTURI :
+    req.session.RESTURI = req.query.proxyRestUri;
+	
+	(typeof(req.query.proxyRestUri) == 'undefined' || req.query.proxyRestUri === null) ?
+	req.session.targetId = config.REDIRECT :
+    req.session.targetId = req.query.targetId;
+	
+	
+    console.log("Root request, received:", req.query);
+	console.log("Session targetId: ",req.session.targetId);
+	console.log("Session RESTURI: ",req.session.RESTURI);
+	
+    res.sendfile('SelectUser.htm');
  });
 
 app.get('/logout', function (req, res) {
@@ -68,9 +81,10 @@ app.get('/logout', function (req, res) {
 app.get('/login', function (req, res) {
     var selectedUser = req.query.selectedUser;
     var userDirectory = req.query.userDirectory;
-    console.log("Login user: "+selectedUser+" Directory: "+userDirectory);
+	
+    console.log("Login user: ",selectedUser," Directory: ",userDirectory);
 
-    requestticket(req, res, selectedUser, userDirectory);
+    requestticket(req, res, selectedUser, userDirectory, req.session.RESTURI, req.session.targetId);
 	req.session.destroy();
 });
 
@@ -95,9 +109,9 @@ function logout(req, res, selectedUser, userDirectory) {
 
     //Configure parameters for the logout request
     var options = {
-        host: url.parse(config.RESTURI).hostname,
-        port: url.parse(config.RESTURI).port,
-        path: url.parse(config.RESTURI).path+'/user/'+userDirectory.toString()+'/' + selectedUser.toString() + '?xrfkey=aaaaaaaaaaaaaaaa',
+        host: url.parse(req.session.RESTURI).hostname,
+        port: url.parse(req.session.RESTURI).port,
+        path: url.parse(req.session.RESTURI).path+'/user/'+userDirectory.toString()+'/' + selectedUser.toString() + '?xrfkey=aaaaaaaaaaaaaaaa',
         method: 'DELETE',
         headers: { 'X-qlik-xrfkey': 'aaaaaaaaaaaaaaaa', 'Content-Type': 'application/json' },
 		pfx: fs.readFileSync('client.pfx'),
@@ -132,13 +146,12 @@ function logout(req, res, selectedUser, userDirectory) {
 };
 
 
-function requestticket(req, res, selecteduser, userdirectory) {
-
+function requestticket(req, res, selecteduser, userdirectory, RESTURI, targetId) {
     //Configure parameters for the ticket request
     var options = {
-        host: url.parse(config.RESTURI).hostname,
-        port: url.parse(config.RESTURI).port,
-        path: url.parse(config.RESTURI).path + '/ticket?xrfkey=aaaaaaaaaaaaaaaa',
+        host: url.parse(RESTURI).hostname,
+        port: url.parse(RESTURI).port,
+        path: url.parse(RESTURI).path + '/ticket?xrfkey=aaaaaaaaaaaaaaaa',
         method: 'POST',
         headers: { 'X-qlik-xrfkey': 'aaaaaaaaaaaaaaaa', 'Content-Type': 'application/json' },
 		pfx: fs.readFileSync('client.pfx'),
@@ -161,6 +174,9 @@ function requestticket(req, res, selecteduser, userdirectory) {
             var ticket = JSON.parse(d.toString());
 			
 			//Add the QlikTicket to the redirect URL regardless whether the existing REDIRECT has existing params.
+			
+			console.log("REDIRECT: ",config.REDIRECT);
+			console.log("targetId: ",targetId);
 			var myRedirect = url.parse(config.REDIRECT);
 			
 			var myQueryString = querystring.parse(myRedirect.query);
