@@ -17,7 +17,7 @@
     {
 		margin-left: 100px;
 		margin-right: 250px;
-		margin-top: 100px;
+		margin-top: 20px;
         font-family: 'QlikView Sans';
         font-size: 1.0em;
         background-image: url('/resource/qv'),url('/resource/background');
@@ -28,14 +28,18 @@
     }
 
 	.UserBtn {
-	  float: right;
+    float: right;
+    margin-top: 20px;
 	  margin-bottom: 0px;
 	  margin-left: 5px;
 	}
 
 	.UserLogin {
-	  vertical-align: middle;
-	  align: left;
+    vertical-align: middle;
+    align: left;
+    margin-left: 50px;
+    margin-top: 20px;
+    margin-bottom: 30px;
 	}
 
 </style>
@@ -43,6 +47,7 @@
 <span class="UserLogin">
 <img src="resource/icon" />&nbsp;
 <select id="UserList" class="UserLogin" name="QVNCYCLES" onchange="doLogin(this);">
+ <option value="NoUser">Select a user from the list above</option>
  <option value="bbr">Bryan Baker (bbr) - Vice President of Sales</option>
  <option value="ams">Amy Alberts (ams) - European Sales Manager</option>
  <option value="stg">Stephen Jiang (stg) - North American Sales Manager</option>
@@ -50,7 +55,7 @@
  <option value="frt">François Ajenstat (frt) - Sales Representative</option>
  <option value="raz">Rachel Valdez (raz) - Sales Representative</option>
  <option value="lan">Laura Norman (lan) - Chief Financial Officer</option>
- <option value="bad">Barbara Moreland (bad) - Accountant</option> 
+ <option value="bad">Barbara Moreland (bad) - Accountant</option>
  <option value="pas">Paula Barreto de Mattos (pas) - Human Resources Manager</option>
  <option value="kag">Karen Berg (kag) - BI Developer</option>
  <option value="ran">Ramesh Meyyappan (ran) - BI Developer</option>
@@ -68,17 +73,17 @@
 <script>
   var query = getQueryParams(document.location.search);
   var contentFrame = document.getElementById('targetFrame');
-  
+
   if (query.QlikRedirect) {
     //If we get a ticket, show the QlikRedirect URL using the QlikTicket, hide the user selection message, and show the reset/logout button
 	contentFrame.height = window.innerHeight - 200;
 	contentFrame.src = query.QlikRedirect;
-	
+
 	contentFrame.style.display = "block";
 	document.getElementById('selectuser').style.display = "none";
 	document.getElementById('reset').style.display = "block";
 	document.getElementById('logoutspan').style.display = "block";
-	
+
   } else {
     //If we don't have a ticket, show the select user message and hide the reset/iframe/logout items
   	document.getElementById('selectuser').style.display = "block";
@@ -86,20 +91,20 @@
 	document.getElementById('reset').style.display = "none";
 	document.getElementById('logoutspan').style.display = "none";
   }
-  
+
   //If we get an authenticated user, select the user in the drop down and disable the others
   if (query.selecteduser) {
     var selectElem = document.getElementById( 'UserList');
 	selectElem.value = query.selecteduser;
-	
-	for (i = 0; i < selectElem.options.length; i++) { 
+
+	for (i = 0; i < selectElem.options.length; i++) {
 	(selectElem.options[i].selected)
-      ? selectElem.options[i].disabled = false 
+      ? selectElem.options[i].disabled = false
       : selectElem.options[i].disabled = true ;
 	}
 
   }
-  
+
   function doLogin(my) {
 	  document.location = "/login?selectedUser="+my.value+"&userDirectory="+my.name;
 	}
@@ -109,11 +114,11 @@
 	  contentFrame.height = window.innerHeight - 200;
 	  contentFrame.src = removeURLParameter(query.QlikRedirect,'QlikTicket');
 	}
-	
+
   function doLogout() {
 	  document.location = "/logout?selectedUser="+query.selecteduser+"&userDirectory="+document.getElementById('UserList').name;
 	}
-	
+
   function getQueryParams(qs) {
     qs = qs.split('+').join(' ');
 
@@ -129,16 +134,16 @@
   }
 
   function removeURLParameter(url, parameter) {
-    var urlparts= url.split('?');   
+    var urlparts= url.split('?');
     if (urlparts.length>=2) {
 
         var prefix= encodeURIComponent(parameter)+'=';
         var pars= urlparts[1].split(/[&;]/g);
 
         //reverse iteration as may be destructive
-        for (var i= pars.length; i-- > 0;) {    
+        for (var i= pars.length; i-- > 0;) {
             //idiom for string.startsWith
-            if (pars[i].lastIndexOf(prefix, 0) !== -1) {  
+            if (pars[i].lastIndexOf(prefix, 0) !== -1) {
                 pars.splice(i, 1);
             }
         }
@@ -151,6 +156,6 @@
 }
 
 </script>
-	
+
 </body>
 </html>
