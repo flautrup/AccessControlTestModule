@@ -12,137 +12,145 @@
         font-weight: normal;
 	    font-style: normal;
     }
-		
+
     body
     {
-		margin-left: 200px;
+		margin-left: 100px;
+		margin-right: 250px;
 		margin-top: 100px;
-		width: 960px;
-		height: 768px;
         font-family: 'QlikView Sans';
         font-size: 1.0em;
         background-image: url('/resource/qv'),url('/resource/background');
 		background-size: 220px, 400px;
         background-repeat:no-repeat, no-repeat;
-        background-position: 0px 0px, 700px 500px;
+        background-position: left top, right bottom;
 		background-attachment: fixed, fixed;
     }
-	    
-    #tableheader 
-    {
-        color: #5F6062;
-        background-color: #62AC1E;
-        line-height: 2;
-    }
+
+	.UserBtn {
+	  float: right;
+	  margin-bottom: 0px;
+	  margin-left: 5px;
+	}
+
+	.UserLogin {
+	  vertical-align: middle;
+	  align: left;
+	}
+
 </style>
 </def>
-    <h1 style='color: #5F6062; font-size: 23pt; font-weight: bold; font-family: Arial;'>Changing user</h1>
-    <table border="0">
-        <tr id="tableheader">
-			<td colspan='2'>UserID</td>
-			<td>Name</td>
-			<td>Role</td>
-			<td>Action</td>
-        </tr>
-        <tr>
-            <td><img src="resource/icon" /></td>
-			<td>bbr</td>
-			<td>Bryan Baker</td>
-			<td>Vice President of Sales</td>
-			<td><a href="/login?selectedUser=bbr&userDirectory=QVNCYCLES">Login</a></td>
-        </tr>
-        <tr>
-            <td><img src="resource/icon" /></td>
-			<td>ams</td>
-			<td>Amy Alberts</td>
-			<td>European Sales Manager</td>
-			<td><a href="/login?selectedUser=ams&userDirectory=QVNCYCLES">Login</a></td>
-        </tr>		
-        <tr>
-            <td><img src="resource/icon" /></td>
-			<td>stg</td>
-			<td>Stephen Jiang</td>
-			<td>North American Sales Manager</td>
-			<td><a href="/login?selectedUser=stg&userDirectory=QVNCYCLES">Login</a></td>
-        </tr>
-		<tr>
-            <td><img src="resource/icon" /></td>
-			<td>dal</td>
-			<td>David Campbell</td>
-			<td>Sales Representative</td>
-			<td><a href="/login?selectedUser=dal&userDirectory=QVNCYCLES">Login</a></td>
-        </tr>
-		<tr>
-            <td><img src="resource/icon" /></td>
-			<td>frt</td>
-			<td>François Ajenstat</td>
-			<td>Sales Representative</td>
-			<td><a href="/login?selectedUser=frt&userDirectory=QVNCYCLES">Login</a></td>
-        </tr>
-		<tr>
-            <td><img src="resource/icon" /></td>
-			<td>raz</td>
-			<td>Rachel Valdez</td>
-			<td>Sales Representative</td>
-			<td><a href="/login?selectedUser=raz&userDirectory=QVNCYCLES">Login</a></td>
-        </tr>	
-		<tr>
-            <td><img src="resource/icon" /></td>
-			<td>lan</td>
-			<td>Laura Norman</td>
-			<td>Chief Financial Officer</td>
-			<td><a href="/login?selectedUser=lan&userDirectory=QVNCYCLES">Login</a></td>
-        </tr>
-		<tr>
-            <td><img src="resource/icon" /></td>
-			<td>raz</td>
-			<td>Barbara Moreland</td>
-			<td>Accountant</td>
-			<td><a href="/login?selectedUser=bad&userDirectory=QVNCYCLES">Login</a></td>
-        </tr>		
-		<tr>
-            <td><img src="resource/icon" /></td>
-			<td>pas</td>
-			<td>Paula Barreto de Mattos</td>
-			<td>Human Resources Manager</td>
-			<td><a href="/login?selectedUser=pas&userDirectory=QVNCYCLES">Login</a></td>
-        </tr>		
-		<tr>
-            <td><img src="resource/icon" /></td>
-			<td>jao</td>
-			<td>Janaina Bueno</td>
-			<td>BI Developer</td>
-			<td><a href="/login?selectedUser=jao&userDirectory=QVNCYCLES">Login</a></td>
-        </tr>
-		<tr>
-            <td><img src="resource/icon" /></td>
-			<td>kag</td>
-			<td>Karen Berg</td>
-			<td>BI Developer</td>
-			<td><a href="/login?selectedUser=kag&userDirectory=QVNCYCLES">Login</a></td>
-        </tr>
-		<tr>
-            <td><img src="resource/icon" /></td>
-			<td>ran</td>
-			<td>Ramesh Meyyappan</td>
-			<td>BI Developer</td>
-			<td><a href="/login?selectedUser=ran&userDirectory=QVNCYCLES">Login</a></td>
-        </tr>
-		<tr>
-            <td><img src="resource/icon" /></td>
-			<td>asa</td>
-			<td>Ashvini Sharma</td>
-			<td>Content Administrator</td>
-			<td><a href="/login?selectedUser=asa&userDirectory=QVNCYCLES">Login</a></td>
-        </tr>
-		<tr>
-            <td><img src="resource/icon" /></td>
-			<td>pey</td>
-			<td>Peter Connelly</td>
-			<td>System Administrator</td>
-			<td><a href="/login?selectedUser=pey&userDirectory=QVNCYCLES">Login</a></td>
-        </tr>	
-    </table>
+<span class="UserLogin">
+<img src="resource/icon" />&nbsp;
+<select id="UserList" class="UserLogin" name="QVNCYCLES" onchange="doLogin(this);">
+ <option value="bbr">Bryan Baker (bbr) - Vice President of Sales</option>
+ <option value="ams">Amy Alberts (ams) - European Sales Manager</option>
+ <option value="stg">Stephen Jiang (stg) - North American Sales Manager</option>
+ <option value="dal">David Campbell (dal) - Sales Representative</option>
+ <option value="frt">François Ajenstat (frt) - Sales Representative</option>
+ <option value="raz">Rachel Valdez (raz) - Sales Representative</option>
+ <option value="lan">Laura Norman (lan) - Chief Financial Officer</option>
+ <option value="bad">Barbara Moreland (bad) - Accountant</option> 
+ <option value="pas">Paula Barreto de Mattos (pas) - Human Resources Manager</option>
+ <option value="kag">Karen Berg (kag) - BI Developer</option>
+ <option value="ran">Ramesh Meyyappan (ran) - BI Developer</option>
+ <option value="asa">Ashvini Sharma (asa) - Content Administrator</option>
+ <option value="pey">Peter Connelly (pey) - System Administrator</option>
+</select>
+</span>
+<BUTTON id="logoutspan" class="UserBtn" style="display: none;" onclick="doLogout();">Logout</BUTTON>
+<BUTTON id="reset"		class="UserBtn" style="display: none;" onclick="doReset();">Reset</BUTTON>
+
+
+<div id="analysis"><iframe id="targetFrame" style="display: none;" src="" width="100%"></iframe></div>
+<div id="selectuser" style="display: block;">Select a user from the list above.</div>
+
+<script>
+  var query = getQueryParams(document.location.search);
+  var contentFrame = document.getElementById('targetFrame');
+  
+  if (query.QlikRedirect) {
+    //If we get a ticket, show the QlikRedirect URL using the QlikTicket, hide the user selection message, and show the reset/logout button
+	contentFrame.height = window.innerHeight - 200;
+	contentFrame.src = query.QlikRedirect;
+	
+	contentFrame.style.display = "block";
+	document.getElementById('selectuser').style.display = "none";
+	document.getElementById('reset').style.display = "block";
+	document.getElementById('logoutspan').style.display = "block";
+	
+  } else {
+    //If we don't have a ticket, show the select user message and hide the reset/iframe/logout items
+  	document.getElementById('selectuser').style.display = "block";
+	contentFrame.style.display = "none";
+	document.getElementById('reset').style.display = "none";
+	document.getElementById('logoutspan').style.display = "none";
+  }
+  
+  //If we get an authenticated user, select the user in the drop down and disable the others
+  if (query.selecteduser) {
+    var selectElem = document.getElementById( 'UserList');
+	selectElem.value = query.selecteduser;
+	
+	for (i = 0; i < selectElem.options.length; i++) { 
+	(selectElem.options[i].selected)
+      ? selectElem.options[i].disabled = false 
+      : selectElem.options[i].disabled = true ;
+	}
+
+  }
+  
+  function doLogin(my) {
+	  document.location = "/login?selectedUser="+my.value+"&userDirectory="+my.name;
+	}
+
+  function doReset() {
+	  contentFrame = document.getElementById('targetFrame');
+	  contentFrame.height = window.innerHeight - 200;
+	  contentFrame.src = removeURLParameter(query.QlikRedirect,'QlikTicket');
+	}
+	
+  function doLogout() {
+	  document.location = "/logout?selectedUser="+query.selecteduser+"&userDirectory="+document.getElementById('UserList').name;
+	}
+	
+  function getQueryParams(qs) {
+    qs = qs.split('+').join(' ');
+
+    var params = {},
+        tokens,
+        re = /[?&]?([^=]+)=([^&]*)/g;
+
+    while (tokens = re.exec(qs)) {
+        params[decodeURIComponent(tokens[1])] = decodeURIComponent(tokens[2]);
+    }
+
+    return params;
+  }
+
+  function removeURLParameter(url, parameter) {
+    var urlparts= url.split('?');   
+    if (urlparts.length>=2) {
+
+        var prefix= encodeURIComponent(parameter)+'=';
+        var pars= urlparts[1].split(/[&;]/g);
+
+        //reverse iteration as may be destructive
+        for (var i= pars.length; i-- > 0;) {    
+            //idiom for string.startsWith
+            if (pars[i].lastIndexOf(prefix, 0) !== -1) {  
+                pars.splice(i, 1);
+            }
+        }
+
+        url= urlparts[0]+'?'+pars.join('&');
+        return url;
+    } else {
+        return url;
+    }
+}
+
+</script>
+	
 </body>
 </html>
-		
